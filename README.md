@@ -25,11 +25,14 @@ Calorie counter
 h1 { font-size:22px; font-weight:700; letter-spacing:-0.5px; }
 .date-label { font-size:11px; color:rgba(255,255,255,0.3); margin-top:2px; }
 .header-right { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+.top-btns { display:flex; gap:6px; align-items:center; }
 .remaining-box { border-radius:10px; padding:5px 12px; text-align:center; }
 .remaining-val { font-size:17px; font-weight:700; font-family:monospace; }
 .remaining-lbl { font-size:8px; color:rgba(255,255,255,0.3); letter-spacing:1px; text-transform:uppercase; }
 .new-day-btn { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:5px 10px; color:rgba(255,255,255,0.3); font-size:10px; cursor:pointer; transition:all 0.2s; }
 .new-day-btn:hover { border-color:rgba(255,107,107,0.35); color:#ff6b6b; }
+.settings-btn { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; width:30px; height:30px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; transition:all 0.2s; color:rgba(255,255,255,0.3); }
+.settings-btn:hover { border-color:rgba(126,232,162,0.35); color:#7EE8A2; }
 .tip-box { margin:12px 0 16px; background:rgba(96,165,250,0.06); border:1px solid rgba(96,165,250,0.12); border-radius:10px; padding:8px 12px; font-size:11px; color:rgba(96,165,250,0.7); display:flex; gap:6px; }
 .tip-box strong { color:#60A5FA; }
 .bar-row { display:flex; justify-content:space-between; margin-bottom:5px; }
@@ -60,8 +63,6 @@ h1 { font-size:22px; font-weight:700; letter-spacing:-0.5px; }
 .error-msg { font-size:12px; color:#ff8a8a; margin-bottom:10px; }
 .error-btns { display:flex; gap:8px; }
 .err-btn { flex:1; padding:8px; border-radius:8px; font-size:12px; cursor:pointer; }
-
-/* ── Manual form ── */
 .form-box { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:16px; padding:16px; animation:slideDown 0.25s ease; }
 .form-title { font-size:13px; color:rgba(255,255,255,0.6); font-weight:600; margin-bottom:4px; }
 .form-sub { font-size:11px; color:rgba(255,255,255,0.25); margin-bottom:14px; }
@@ -84,7 +85,6 @@ h1 { font-size:22px; font-weight:700; letter-spacing:-0.5px; }
 .submit-btn { flex:2; padding:13px; border-radius:10px; border:none; font-size:14px; font-weight:700; cursor:pointer; transition:all 0.2s; }
 .submit-btn.active { background:linear-gradient(135deg,#7EE8A2,#60A5FA); color:#080B10; }
 .submit-btn.inactive { background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.2); cursor:not-allowed; }
-
 .meal-list { padding:14px 22px 0; display:flex; flex-direction:column; gap:8px; }
 .meal-list-header { display:flex; justify-content:space-between; margin-bottom:2px; }
 .meal-list-lbl { font-size:10px; color:rgba(255,255,255,0.3); letter-spacing:1.5px; text-transform:uppercase; }
@@ -106,14 +106,30 @@ h1 { font-size:22px; font-weight:700; letter-spacing:-0.5px; }
 .empty-state { text-align:center; padding:40px 0; }
 .empty-icon { font-size:40px; margin-bottom:12px; }
 .empty-txt { font-size:14px; color:rgba(255,255,255,0.25); line-height:1.6; }
+
+/* ── Modals ── */
 .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); display:flex; align-items:center; justify-content:center; z-index:100; padding:24px; }
-.modal-box { background:#13161f; border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:24px; width:100%; max-width:320px; animation:slideDown 0.2s ease; }
+.modal-box { background:#13161f; border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:24px; width:100%; max-width:340px; animation:slideDown 0.2s ease; }
 .modal-icon { font-size:36px; text-align:center; margin-bottom:12px; }
 .modal-title { font-size:16px; font-weight:700; text-align:center; margin-bottom:8px; }
 .modal-body { font-size:13px; color:rgba(255,255,255,0.4); text-align:center; line-height:1.5; margin-bottom:20px; }
 .modal-btns { display:flex; gap:10px; }
 .modal-keep { flex:1; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:transparent; color:rgba(255,255,255,0.5); font-size:14px; cursor:pointer; }
 .modal-clear { flex:1; padding:12px; border-radius:12px; border:none; background:linear-gradient(135deg,#ff6b6b,#ff8e53); color:#fff; font-size:14px; font-weight:700; cursor:pointer; }
+
+/* ── Settings panel ── */
+.settings-panel { background:#13161f; border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:24px; width:100%; max-width:340px; animation:slideDown 0.2s ease; }
+.settings-title { font-size:16px; font-weight:700; margin-bottom:4px; }
+.settings-sub { font-size:11px; color:rgba(255,255,255,0.35); margin-bottom:20px; }
+.settings-section { margin-bottom:20px; }
+.settings-label { font-size:11px; font-weight:600; color:#7EE8A2; letter-spacing:0.5px; margin-bottom:8px; }
+.settings-row { display:flex; gap:8px; }
+.settings-input { flex:1; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:10px 12px; color:#fff; font-size:13px; font-family:monospace; }
+.settings-save { padding:10px 16px; border-radius:10px; border:none; background:#7EE8A2; color:#080B10; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.settings-saved { font-size:11px; color:#7EE8A2; margin-top:6px; display:flex; align-items:center; gap:4px; }
+.settings-hint { font-size:11px; color:rgba(255,255,255,0.3); margin-top:6px; line-height:1.5; }
+.settings-close { width:100%; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:transparent; color:rgba(255,255,255,0.4); font-size:14px; cursor:pointer; }
+
 .api-setup { margin:12px 0 16px; background:rgba(126,232,162,0.05); border:1px solid rgba(126,232,162,0.15); border-radius:14px; padding:14px; }
 .api-setup-title { font-size:12px; font-weight:600; color:#7EE8A2; margin-bottom:4px; }
 .api-setup-sub { font-size:11px; color:rgba(255,255,255,0.35); margin-bottom:10px; line-height:1.5; }
@@ -141,12 +157,11 @@ const API_KEY_STORE = 'fuellog_apikey';
 const EMOJIS = ["🍽️","🥗","🍳","🥩","🐟","🍣","🍱","🥙","🌮","🍜","🥤","☕","🍸","🧃","🍎","🍌","🥜","🍫","🧁","🍰"];
 
 let meals = [], idCounter = 1;
-let uiMode = 'idle'; // idle | analyzing | error | manual
+let uiMode = 'idle';
 let errorMsg = '', previewUrl = '', lastSource = 'library';
-let showReset = false, showEmojiPicker = false;
+let showReset = false, showSettings = false, showEmojiPicker = false;
+let settingsKeySaved = false;
 let apiKey = localStorage.getItem(API_KEY_STORE) || '';
-
-// Form state — kept separately so inputs don't reset on re-render
 let form = { label:'', emoji:'🍽️', description:'', calories:'', protein:'', carbs:'', fat:'' };
 
 function loadStorage() {
@@ -157,7 +172,7 @@ function saveStorage() {
 }
 loadStorage();
 
-// ── File inputs wired once, permanently ───────────────────────────────────
+// ── File inputs wired once ─────────────────────────────────────────────────
 document.getElementById('cameraInput').addEventListener('change', function() {
   if (this.files[0]) { lastSource='camera'; analyzeImage(this.files[0]); }
   else { uiMode='idle'; render(); }
@@ -190,11 +205,16 @@ function render() {
       <div class="header-top">
         <div><h1>Fuel Log</h1><div class="date-label">${today}</div></div>
         <div class="header-right">
-          <div class="remaining-box" style="background:${remBg};border:1px solid ${remBdr}">
-            <div class="remaining-val" style="color:${remColor}">${Math.abs(rem)}</div>
-            <div class="remaining-lbl">${rem>=0?'left':'over'}</div>
+          <div class="top-btns">
+            <div class="remaining-box" style="background:${remBg};border:1px solid ${remBdr}">
+              <div class="remaining-val" style="color:${remColor}">${Math.abs(rem)}</div>
+              <div class="remaining-lbl">${rem>=0?'left':'over'}</div>
+            </div>
           </div>
-          <button class="new-day-btn" onclick="showResetModal()">↺ New day</button>
+          <div class="top-btns">
+            <button class="new-day-btn" onclick="showResetModal()">↺ New day</button>
+            <button class="settings-btn" onclick="openSettings()" title="Settings">⚙️</button>
+          </div>
         </div>
       </div>
 
@@ -204,7 +224,7 @@ function render() {
         <div class="api-setup-sub">Required for photo analysis. Get one free at <strong style="color:#7EE8A2">console.anthropic.com</strong> → API Keys. Saved in your browser only.</div>
         <div class="api-input-row">
           <input class="api-input" id="apiKeyInput" type="password" placeholder="sk-ant-...">
-          <button class="api-save-btn" onclick="saveApiKey()">Save</button>
+          <button class="api-save-btn" onclick="saveApiKeyInline()">Save</button>
         </div>
       </div>` : `
       <div class="tip-box">
@@ -245,6 +265,56 @@ function render() {
   renderModal();
 }
 
+function renderModal() {
+  const el = document.getElementById('modal');
+
+  if (showReset) {
+    el.innerHTML = `
+      <div class="modal-overlay" onclick="if(event.target===this){showReset=false;render();}">
+        <div class="modal-box">
+          <div class="modal-icon">🗑️</div>
+          <div class="modal-title">Start a new day?</div>
+          <div class="modal-body">This will clear all of today's meals. Use this each morning to reset.</div>
+          <div class="modal-btns">
+            <button class="modal-keep" onclick="showReset=false;render()">Keep it</button>
+            <button class="modal-clear" onclick="resetDay()">Clear day</button>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  if (showSettings) {
+    const masked = apiKey ? '••••••••' + apiKey.slice(-4) : '';
+    el.innerHTML = `
+      <div class="modal-overlay" onclick="if(event.target===this)closeSettings()">
+        <div class="settings-panel">
+          <div class="settings-title">⚙️ Settings</div>
+          <div class="settings-sub">5'10" · 193 → 175 lbs · 2,300 cal · 160g protein</div>
+
+          <div class="settings-section">
+            <div class="settings-label">🔑 ANTHROPIC API KEY</div>
+            ${apiKey ? `<div class="settings-saved">✓ Key saved: ${masked}</div>` : '<div style="font-size:11px;color:rgba(255,107,107,0.7);margin-bottom:8px;">⚠️ No API key saved</div>'}
+            <div style="margin-top:10px">
+              <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">Enter new key to update:</div>
+              <div class="settings-row">
+                <input class="settings-input" id="settingsKeyInput" type="password" placeholder="sk-ant-...">
+                <button class="settings-save" onclick="saveApiKeyFromSettings()">Save</button>
+              </div>
+              <div id="settingsSavedMsg" style="display:none" class="settings-saved">✓ API key updated!</div>
+              <div class="settings-hint">Get a free key at <strong style="color:#7EE8A2">console.anthropic.com</strong> → API Keys</div>
+            </div>
+          </div>
+
+          <button class="settings-close" onclick="closeSettings()">Done</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = '';
+}
+
 function renderAddSection() {
   const el = document.getElementById('addSection');
   if (!el) return;
@@ -281,9 +351,7 @@ function renderAddSection() {
     return;
   }
 
-  if (uiMode === 'manual') {
-    renderManualForm(el);
-  }
+  if (uiMode === 'manual') renderManualForm(el);
 }
 
 function renderManualForm(container) {
@@ -292,18 +360,15 @@ function renderManualForm(container) {
   container.innerHTML = `
     <div class="form-box">
       <div class="form-title">Log a meal</div>
-      <div class="form-sub">Fill in the calories (required) and any other details</div>
-
+      <div class="form-sub">Fill in calories (required) plus any other details</div>
       <div class="emoji-label-row">
-        <button class="emoji-btn" id="emojiBtnEl" onclick="toggleEmoji()">
+        <button class="emoji-btn" onclick="toggleEmoji()">
           <span>${f.emoji}</span>
-          ${showEmojiPicker ? `<div class="emoji-picker" onclick="event.stopPropagation()">${EMOJIS.map(e=>`<button class="emoji-opt" onclick="pickEmoji('${e}')">${e}</button>`).join('')}</div>` : ''}
+          ${showEmojiPicker?`<div class="emoji-picker" onclick="event.stopPropagation()">${EMOJIS.map(e=>`<button class="emoji-opt" onclick="pickEmoji('${e}')">${e}</button>`).join('')}</div>`:''}
         </button>
         <input class="label-input" id="labelInput" placeholder="Meal name (e.g. Breakfast)" value="${esc(f.label)}">
       </div>
-
       <input class="desc-input" id="descInput" placeholder="Description (optional)" value="${esc(f.description)}">
-
       <div class="macro-grid">
         <div class="macro-col">
           <div class="macro-lbl" style="color:#fff">Cal *</div>
@@ -322,40 +387,25 @@ function renderManualForm(container) {
           <input class="macro-input" id="fatInput" type="number" inputmode="numeric" placeholder="0" value="${f.fat}" style="color:#F59E0B">
         </div>
       </div>
-
       <div class="form-btns">
         <button class="cancel-btn" onclick="cancelForm()">Cancel</button>
         <button class="submit-btn ${ok?'active':'inactive'}" id="submitBtn" onclick="submitForm()">
-          ${ok ? '✓ Add to Log' : 'Enter calories to continue'}
+          ${ok?'✓ Add to Log':'Enter calories to continue'}
         </button>
       </div>
     </div>`;
-
-  // Attach live listeners AFTER rendering — no oninput in HTML
   bindFormListeners();
 }
 
 function bindFormListeners() {
-  const cal  = document.getElementById('calInput');
-  const pro  = document.getElementById('proInput');
-  const carb = document.getElementById('carbInput');
-  const fat  = document.getElementById('fatInput');
-  const lbl  = document.getElementById('labelInput');
-  const desc = document.getElementById('descInput');
-
-  if (cal) {
-    cal.addEventListener('input', () => {
-      form.calories = cal.value;
-      updateSubmitBtn();
-    });
-    // Focus the calories field automatically
-    setTimeout(() => cal.focus(), 80);
-  }
-  if (pro)  pro.addEventListener('input',  () => { form.protein = pro.value; });
-  if (carb) carb.addEventListener('input', () => { form.carbs   = carb.value; });
-  if (fat)  fat.addEventListener('input',  () => { form.fat     = fat.value; });
-  if (lbl)  lbl.addEventListener('input',  () => { form.label   = lbl.value; });
-  if (desc) desc.addEventListener('input', () => { form.description = desc.value; });
+  const get = id => document.getElementById(id);
+  const cal=get('calInput'), pro=get('proInput'), carb=get('carbInput'), fat=get('fatInput'), lbl=get('labelInput'), desc=get('descInput');
+  if (cal) { cal.addEventListener('input',()=>{ form.calories=cal.value; updateSubmitBtn(); }); setTimeout(()=>cal.focus(),80); }
+  if (pro)  pro.addEventListener('input',()=>{ form.protein=pro.value; });
+  if (carb) carb.addEventListener('input',()=>{ form.carbs=carb.value; });
+  if (fat)  fat.addEventListener('input',()=>{ form.fat=fat.value; });
+  if (lbl)  lbl.addEventListener('input',()=>{ form.label=lbl.value; });
+  if (desc) desc.addEventListener('input',()=>{ form.description=desc.value; });
 }
 
 function updateSubmitBtn() {
@@ -364,21 +414,6 @@ function updateSubmitBtn() {
   const ok = form.calories.trim() !== '';
   btn.className = `submit-btn ${ok?'active':'inactive'}`;
   btn.textContent = ok ? '✓ Add to Log' : 'Enter calories to continue';
-}
-
-function renderModal() {
-  document.getElementById('modal').innerHTML = showReset ? `
-    <div class="modal-overlay" onclick="if(event.target===this){showReset=false;render();}">
-      <div class="modal-box">
-        <div class="modal-icon">🗑️</div>
-        <div class="modal-title">Start a new day?</div>
-        <div class="modal-body">This will clear all of today's meals. Use this each morning to reset.</div>
-        <div class="modal-btns">
-          <button class="modal-keep" onclick="showReset=false;render()">Keep it</button>
-          <button class="modal-clear" onclick="resetDay()">Clear day</button>
-        </div>
-      </div>
-    </div>` : '';
 }
 
 function ring(value, max, color, label) {
@@ -420,58 +455,53 @@ function mealCard(m) {
 
 // ── Actions ────────────────────────────────────────────────────────────────
 function esc(s) { return (s||'').replace(/"/g,'&quot;'); }
-
 function openManual() { uiMode='manual'; showEmojiPicker=false; render(); }
-
-function cancelForm() {
-  form = { label:'', emoji:'🍽️', description:'', calories:'', protein:'', carbs:'', fat:'' };
-  showEmojiPicker = false; uiMode='idle'; render();
-}
-
-function retryPhoto() {
-  if (lastSource==='camera') document.getElementById('cameraInput').click();
-  else document.getElementById('libraryInput').click();
-}
-
+function cancelForm() { form={label:'',emoji:'🍽️',description:'',calories:'',protein:'',carbs:'',fat:''}; showEmojiPicker=false; uiMode='idle'; render(); }
 function toggleEmoji() { showEmojiPicker=!showEmojiPicker; renderManualForm(document.getElementById('addSection')); }
 function pickEmoji(e) { form.emoji=e; showEmojiPicker=false; renderManualForm(document.getElementById('addSection')); }
+function retryPhoto() { document.getElementById(lastSource==='camera'?'cameraInput':'libraryInput').click(); }
+function showResetModal() { showReset=true; render(); }
+function resetDay() { meals=[]; idCounter=1; saveStorage(); showReset=false; uiMode='idle'; render(); }
+function openSettings() { showSettings=true; settingsKeySaved=false; render(); }
+function closeSettings() { showSettings=false; render(); }
+function deleteMeal(id) { meals=meals.filter(m=>m.id!==id); saveStorage(); render(); }
+
+function saveApiKeyInline() {
+  const val = document.getElementById('apiKeyInput')?.value?.trim();
+  if (!val) return;
+  apiKey=val; localStorage.setItem(API_KEY_STORE,val); render();
+}
+
+function saveApiKeyFromSettings() {
+  const val = document.getElementById('settingsKeyInput')?.value?.trim();
+  if (!val) return;
+  apiKey=val; localStorage.setItem(API_KEY_STORE,val);
+  const msg = document.getElementById('settingsSavedMsg');
+  if (msg) { msg.style.display='flex'; }
+  // Re-render after short delay so user sees confirmation
+  setTimeout(() => render(), 1200);
+}
 
 function submitForm() {
   if (!form.calories.trim()) return;
   const t = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  meals.push({
-    id: idCounter++, time: t,
-    label: form.label||'Meal', description: form.description,
-    calories: +form.calories||0, protein: +form.protein||0,
-    carbs: +form.carbs||0, fat: +form.fat||0,
-    emoji: form.emoji
-  });
+  meals.push({ id:idCounter++, time:t, label:form.label||'Meal', description:form.description, calories:+form.calories||0, protein:+form.protein||0, carbs:+form.carbs||0, fat:+form.fat||0, emoji:form.emoji });
   saveStorage();
-  form = { label:'', emoji:'🍽️', description:'', calories:'', protein:'', carbs:'', fat:'' };
+  form={label:'',emoji:'🍽️',description:'',calories:'',protein:'',carbs:'',fat:''};
   showEmojiPicker=false; uiMode='idle'; render();
 }
 
-function deleteMeal(id) { meals=meals.filter(m=>m.id!==id); saveStorage(); render(); }
-function showResetModal() { showReset=true; render(); }
-function resetDay() { meals=[]; idCounter=1; saveStorage(); showReset=false; uiMode='idle'; render(); }
-
-function saveApiKey() {
-  const val = document.getElementById('apiKeyInput')?.value?.trim();
-  if (!val) return;
-  apiKey=val; localStorage.setItem(API_KEY_STORE, val); render();
-}
-
 async function analyzeImage(file) {
-  if (!apiKey) { errorMsg='Please save your API key first.'; uiMode='error'; render(); return; }
+  if (!apiKey) { errorMsg='No API key — tap ⚙️ to add one, or use Manual entry.'; uiMode='error'; render(); return; }
   const reader = new FileReader();
   reader.onload = async (e) => {
     previewUrl=e.target.result; uiMode='analyzing'; render();
     try {
       const base64=e.target.result.split(',')[1];
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch('https://api.anthropic.com/v1/messages',{
         method:'POST',
-        headers:{ 'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-allow-browser':'true' },
-        body: JSON.stringify({
+        headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-allow-browser':'true'},
+        body:JSON.stringify({
           model:'claude-sonnet-4-20250514', max_tokens:600,
           system:`Nutrition analyzer. User: 5'10", 193lb, active, 2300cal/day, 160g protein goal.
 Return ONLY valid JSON, no markdown:
@@ -487,10 +517,10 @@ Return ONLY valid JSON, no markdown:
       const text=data.content?.find(b=>b.type==='text')?.text||'';
       const p=JSON.parse(text.replace(/```json|```/g,'').trim());
       const t=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-      meals.push({ id:idCounter++, time:t, label:p.label||'Meal', description:p.description||'', calories:p.calories||0, protein:p.protein||0, carbs:p.carbs||0, fat:p.fat||0, emoji:p.emoji||'🍽️' });
+      meals.push({id:idCounter++,time:t,label:p.label||'Meal',description:p.description||'',calories:p.calories||0,protein:p.protein||0,carbs:p.carbs||0,fat:p.fat||0,emoji:p.emoji||'🍽️'});
       saveStorage(); uiMode='idle'; previewUrl=''; render();
     } catch(err) {
-      errorMsg='Analysis failed — check your API key or use Manual entry.';
+      errorMsg='Analysis failed — check your API key in ⚙️ Settings or use Manual entry.';
       uiMode='error'; previewUrl=''; render();
     }
   };
