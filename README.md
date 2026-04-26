@@ -157,15 +157,109 @@ function saveStorage() {
 loadStorage();
 
 document.getElementById('cameraInput').addEventListener('change', function() {
-  if (this.files[0]) { lastSource='camera'; analyzeImage(this.files[0]); }
+  if (this.files[0]) { lastSource='camera'; processImage(this.files[0]); }
   else { uiMode='idle'; render(); }
   this.value='';
 });
 document.getElementById('libraryInput').addEventListener('change', function() {
-  if (this.files[0]) { lastSource='library'; analyzeImage(this.files[0]); }
+  if (this.files[0]) { lastSource='library'; processImage(this.files[0]); }
   else { uiMode='idle'; render(); }
   this.value='';
 });
+
+// ── Compress image before sending ─────────────────────────────────────────
+function compressImage(file, maxWidth, quality) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const scale = Math.min(1, maxWidth / img.width);
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', quality);
+      const base64 = dataUrl.split(',')[1];
+      resolve({ base64, dataUrl });
+    };
+    img.src = url;
+  });
+}
+
+async function processImage(file) {
+  uiMode = 'analyzing';
+  previewUrl = URL.createObjectURL(file);
+  render();
+
+  try {
+    // Compress to max 800px wide at 0.7 quality — keeps it well under limits
+    const { base64, dataUrl } = await compressImage(file, 800, 0.7);
+    previewUrl = dataUrl;
+    render();
+    await analyzeImage(base64, 'image/jpeg');
+  } catch(err) {
+    errorMsg = 'Image processing failed';
+    errorDetail = err.message || String(err);
+    uiMode = 'error'; previewUrl = ''; render();
+  }
+}
+
+async function analyzeImage(base64, mediaType) {
+  if (!workerUrl) {
+    errorMsg = 'No worker URL set.';
+    errorDetail = 'Tap Settings and paste your Cloudflare Worker URL.';
+    uiMode='error'; render(); return;
+  }
+
+  try {
+    const res = await fetch(workerUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        system: `Nutrition analyzer. User: 5'10", 193lb, active, 2300cal/day, 160g protein goal.
+Return ONLY valid JSON, no markdown:
+{"label":"short type","emoji":"single emoji","description":"max 80 chars","calories":number,"protein":number,"carbs":number,"fat":number}`,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+            { type: 'text', text: 'Analyze this food and return JSON.' }
+          ]
+        }]
+      })
+    });
+
+    const rawText = await res.text();
+    let data;
+    try { data = JSON.parse(rawText); } catch {
+      errorMsg = 'Worker returned unexpected response';
+      errorDetail = rawText.slice(0, 200);
+      uiMode='error'; previewUrl=''; render(); return;
+    }
+
+    if (data.error) {
+      errorMsg = 'API Error: ' + (data.error.type || 'unknown');
+      errorDetail = data.error.message || JSON.stringify(data.error);
+      uiMode='error'; previewUrl=''; render(); return;
+    }
+
+    const text = data.content?.find(b => b.type==='text')?.text || '';
+    const p = JSON.parse(text.replace(/```json|```/g,'').trim());
+    const t = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    meals.push({ id:idCounter++, time:t, label:p.label||'Meal', description:p.description||'', calories:p.calories||0, protein:p.protein||0, carbs:p.carbs||0, fat:p.fat||0, emoji:p.emoji||'🍽️' });
+    saveStorage(); uiMode='idle'; previewUrl=''; render();
+
+  } catch(err) {
+    errorMsg = 'Network error connecting to worker';
+    errorDetail = err.message || String(err);
+    uiMode='error'; previewUrl=''; render();
+  }
+}
 
 function render() {
   const tot = meals.reduce((a,m)=>({
@@ -202,8 +296,8 @@ function render() {
 
       <div class="tip-box">
         ${hasWorker
-          ? `<span>📸</span><span>Tap <strong>📷 Camera</strong> or <strong>🖼️ Library</strong> to analyze a photo, or <strong>✏️ Manual</strong> to type numbers in.</span>`
-          : `<span>⚙️</span><span>Tap <strong>⚙️ Settings</strong> to add your Cloudflare Worker URL to enable photo analysis.</span>`}
+          ? `<span>📸</span><span>Tap <strong>📷 Camera</strong> or <strong>🖼️ Library</strong> to analyze a photo, or <strong>✏️ Manual</strong> to type numbers.</span>`
+          : `<span>⚙️</span><span>Tap <strong>⚙️ Settings</strong> to add your Cloudflare Worker URL.</span>`}
       </div>
 
       <div class="bar-row"><span class="bar-lbl">CALORIES</span><span class="bar-val">${tot.calories} / ${GOAL_CAL}</span></div>
@@ -238,7 +332,6 @@ function render() {
 
 function renderModal() {
   const el = document.getElementById('modal');
-
   if (showReset) {
     el.innerHTML = `
       <div class="modal-overlay" onclick="if(event.target===this){showReset=false;render();}">
@@ -254,44 +347,37 @@ function renderModal() {
       </div>`;
     return;
   }
-
   if (showSettings) {
-    const shortUrl = workerUrl ? workerUrl.replace('https://','').slice(0,40)+'…' : '';
+    const shortUrl = workerUrl ? workerUrl.replace('https://','').slice(0,35)+'…' : '';
     el.innerHTML = `
       <div class="modal-overlay" onclick="if(event.target===this)closeSettings()">
         <div class="settings-panel">
           <div class="settings-title">⚙️ Settings</div>
-          <div class="settings-sub">5'10" · 193 → 175 lbs · 2,300 cal · 160g protein goal</div>
-
+          <div class="settings-sub">5'10" · 193 → 175 lbs · 2,300 cal · 160g protein</div>
           <div class="settings-label">☁️ CLOUDFLARE WORKER URL</div>
           <div class="worker-status">
             <div class="status-dot" style="background:${workerUrl?'#7EE8A2':'rgba(255,107,107,0.7)'}"></div>
             <span style="color:${workerUrl?'rgba(126,232,162,0.8)':'rgba(255,107,107,0.7)'}">
-              ${workerUrl ? `Connected: ${shortUrl}` : 'Not set — photo analysis disabled'}
+              ${workerUrl ? `Connected: ${shortUrl}` : 'Not set'}
             </span>
           </div>
           <div class="settings-row">
             <input class="settings-input" id="workerInput" type="url" placeholder="https://your-worker.workers.dev" value="${esc(workerUrl)}">
             <button class="settings-save" onclick="saveWorkerUrl()">Save</button>
           </div>
-          <div id="workerSavedMsg" style="display:none;color:#7EE8A2;font-size:11px;margin-top:6px;">✓ Worker URL saved!</div>
-          <div class="settings-hint">
-            Deploy the <strong>worker.js</strong> file to Cloudflare Workers, add your <strong>ANTHROPIC_API_KEY</strong> as a secret, then paste the worker URL above.
-          </div>
-
+          <div id="workerSavedMsg" style="display:none;color:#7EE8A2;font-size:11px;margin-top:6px;">✓ Saved!</div>
+          <div class="settings-hint">Your Cloudflare Worker URL goes here. Deploy worker.js to Cloudflare with your ANTHROPIC_API_KEY secret.</div>
           <button class="settings-close" onclick="closeSettings()" style="margin-top:20px">Done</button>
         </div>
       </div>`;
     return;
   }
-
   el.innerHTML = '';
 }
 
 function renderAddSection() {
   const el = document.getElementById('addSection');
   if (!el) return;
-
   if (uiMode === 'idle') {
     el.innerHTML = `
       <div class="add-btn-row">
@@ -305,7 +391,7 @@ function renderAddSection() {
     el.innerHTML = `
       <div class="analyzing-box">
         ${previewUrl?`<div class="analyzing-preview" style="background-image:url(${previewUrl})"></div>`:''}
-        <div style="position:relative;z-index:1"><div class="spinner"></div><div class="analyzing-txt">Analyzing your food…</div></div>
+        <div style="position:relative;z-index:1"><div class="spinner"></div><div class="analyzing-txt">Compressing &amp; analyzing…</div></div>
       </div>`;
     return;
   }
@@ -427,61 +513,6 @@ function submitForm() {
   saveStorage();
   form={label:'',emoji:'🍽️',description:'',calories:'',protein:'',carbs:'',fat:''};
   showEmojiPicker=false; uiMode='idle'; render();
-}
-
-async function analyzeImage(file) {
-  if (!workerUrl) {
-    errorMsg = 'No worker URL set.';
-    errorDetail = 'Tap ⚙️ Settings and paste your Cloudflare Worker URL.';
-    uiMode='error'; render(); return;
-  }
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    previewUrl=e.target.result; uiMode='analyzing'; render();
-    try {
-      const base64=e.target.result.split(',')[1];
-      const res = await fetch(workerUrl, {
-        method:'POST',
-        headers:{ 'Content-Type':'application/json' },
-        body: JSON.stringify({
-          model:'claude-sonnet-4-20250514', max_tokens:600,
-          system:`Nutrition analyzer. User: 5'10", 193lb, active, 2300cal/day, 160g protein goal.
-Return ONLY valid JSON, no markdown:
-{"label":"short type","emoji":"single emoji","description":"max 80 chars","calories":number,"protein":number,"carbs":number,"fat":number}`,
-          messages:[{role:'user',content:[
-            {type:'image',source:{type:'base64',media_type:file.type,data:base64}},
-            {type:'text',text:'Analyze this food and return JSON.'}
-          ]}]
-        })
-      });
-
-      const rawText = await res.text();
-      let data;
-      try { data = JSON.parse(rawText); } catch {
-        errorMsg = `HTTP ${res.status} — unexpected response`;
-        errorDetail = rawText.slice(0,300);
-        uiMode='error'; previewUrl=''; render(); return;
-      }
-
-      if (data.error) {
-        errorMsg = `API Error: ${data.error.type||'unknown'}`;
-        errorDetail = data.error.message||JSON.stringify(data.error);
-        uiMode='error'; previewUrl=''; render(); return;
-      }
-
-      const text = data.content?.find(b=>b.type==='text')?.text||'';
-      const p = JSON.parse(text.replace(/```json|```/g,'').trim());
-      const t = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-      meals.push({ id:idCounter++, time:t, label:p.label||'Meal', description:p.description||'', calories:p.calories||0, protein:p.protein||0, carbs:p.carbs||0, fat:p.fat||0, emoji:p.emoji||'🍽️' });
-      saveStorage(); uiMode='idle'; previewUrl=''; render();
-
-    } catch(err) {
-      errorMsg = 'Network error connecting to worker';
-      errorDetail = err.message||String(err);
-      uiMode='error'; previewUrl=''; render();
-    }
-  };
-  reader.readAsDataURL(file);
 }
 
 render();
